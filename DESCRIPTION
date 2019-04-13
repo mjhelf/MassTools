@@ -1,0 +1,18 @@
+Package: MassTools
+Title: R package for mass and molecular formula calculations
+Version: 0.1.0
+Authors@R: person("Maximilian", "Helf", email = "mjh438@cornell.edu", role = c("aut", "cre"))
+BiocViews: MassSpectrometry, DataAnalysis
+Description: Provides heuristic filters for molecula formulas calculated with Rdisop and simple formatting functions for molecular formulas.
+Depends: R (>= 3.3.0)
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.0
+Imports: Rdisop,
+    data.table
+Suggests: covr,
+    knitr,
+    rmarkdown,
+    testthat,
+VignetteBuilder: knitr
