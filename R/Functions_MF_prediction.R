@@ -67,7 +67,8 @@ getSenior3 <- function(MF, vals = c(C = 4, H = 1,
 #' }}
 #' 
 #' @importFrom data.table rbindlist as.data.table data.table
-#' @importFrom Rdisop decomposeMass
+#' @importFrom Rdisop decomposeMass initializeCHNOPS
+#' @importFrom BiocParallel bplapply SerialParam
 #' 
 #' @export
 calcMF <- function(mz = 200.000659,
@@ -81,14 +82,15 @@ calcMF <- function(mz = 200.000659,
                    elementHeuristic = T,
                    Filters = list(DBErange = c(-5,40),
                                   minElements = "C0H0P0S0N0O0",
-                                  maxElements = "C9999H9999P2S2N9999O9999",
+                                  maxElements = "C9999H9999P9999S9999N9999O9999",
                                   parity = "e",
                                   maxCounts = T,
                                   SENIOR3 = 0,
                                   HCratio = T,
                                   moreRatios = T,
                                   elementHeuristic = T),
-                   summarize = F
+                   summarize = F,
+                   BPPARAM = NULL
 ){
   
   if(is.null(Filters$minElements) 
@@ -105,12 +107,46 @@ calcMF <- function(mz = 200.000659,
     Filters$maxElements <- makeMF(Filters$maxElements)
   }else{simpleError("Filters$maxElements format is not correct")}
   
+  
+  if(is.null(elements)){
+    elements = initializeCHNOPS()
+  }
+  
+  if(length(mz)>1){
+    
+  
+   rl <- bplapply(mz,calcMF,
+           z = z,
+           ppm = ppm,
+           elements = elements,
+           maxCounts = maxCounts,
+           SeniorRule = SeniorRule,
+           HCratio = HCratio,
+           moreRatios = moreRatios,
+           elementHeuristic = elementHeuristic,
+           Filters = Filters,
+           summarize = summarize,
+           BPPARAM=if(is.null(BPPARAM)){SerialParam()}else{BPPARAM})
+    
+   if(summarize){
+   return(unlist(rl))
+   }else{
+   return(rl)
+     }
+     
+  }
+  
+  
+  
   #how to handle it if there are no molecula formulas given filter conditions
   if(summarize){
     failReturn <- "" 
   }else{
     failReturn <- NULL
   }
+  
+  
+  
   
   mm <- decomposeMass(mz, z = z, maxisotopes = 1, ppm = ppm, elements = elements)
   
@@ -163,7 +199,7 @@ if(!is.null(Filters$maxElements)){
     if(!is.null(Filters$minElements)){
       minmatch <- match(names(sf),names(Filters$minElements))
       
-      if(any(sf[!is.na(minmatch)] > Filters$minElements[na.omit(minmatch)])){return(FALSE)}
+      if(any(sf[!is.na(minmatch)] < Filters$minElements[na.omit(minmatch)])){return(FALSE)}
     } 
     
     return(TRUE)
