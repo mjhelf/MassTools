@@ -7,6 +7,8 @@
 #' @export
 reformatMFstring <- function(s){
   
+  s <- gsub(" ", "",s)
+  
   #finds adjacent element names
   foundLL <- regexpr("[A-z][A-Z]|[A-z]$",s)
   
@@ -37,26 +39,22 @@ reformatMFstring <- function(s){
 #' @export
 consolidateMF <- function(x){
   
-  dups <- duplicated(names(x))
+  target <- getOption("MassTools.elements")
   
-  if(!any(dups)){
-    class(x) <- "MFobject"
-    return(x)
-  }
+  x <- unclass(x)
   
-  eles <- unique(names(x))
-  counts <- integer(length(eles))
-  names(counts) <- eles
+  matched <- match(names(x),names(target))
   
-  for(i in names(counts)){
+  for(i in unique(matched)){
     
-    counts[i] <- sum(x[names(x) == i])
+    #put everything into the first instance
+    target[i] <- sum(x[matched == i])
     
   }
   
-  class(counts) <- "MFobject"
+  class(target) <- "MFobject"
   
-  return(counts)
+  return(target)
   
 }
 
@@ -98,7 +96,7 @@ makeMF <- function(s, forcelist = F){
 #'
 #' @export
 remakeMF <- function(x){
-  
-  return(paste(names(x[x!=0]), x[x!=0], collapse = "", sep = ""))
+
+  return(paste(names(x[x!=0]), gsub("^1$","",x[x!=0]), collapse = "", sep = ""))
   
 }
