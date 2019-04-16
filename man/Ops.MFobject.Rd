@@ -7,8 +7,10 @@
 \method{Ops}{MFobject}(a, b)
 }
 \arguments{
-\item{x}{element count vector}
+\item{a}{numeric or MFobject}
+
+\item{b}{numeric or MFobject}
 }
 \description{
-Merges element count vectors
+Operator behavior for MFobject S3 class
 }

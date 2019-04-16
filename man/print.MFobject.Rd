@@ -6,6 +6,9 @@
 \usage{
 \method{print}{MFobject}(s)
 }
+\arguments{
+\item{s}{MFobject}
+}
 \description{
 Print method for MFobject S3 class
 }

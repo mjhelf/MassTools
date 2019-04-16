@@ -45,13 +45,19 @@ consolidateMF <- function(x){
   
   matched <- match(names(x),names(target))
   
+  if(!any(duplicated(names(x)))){
+    
+    target[matched] <- x
+    
+  }else{
+  
   for(i in unique(matched)){
     
-    #put everything into the first instance
     target[i] <- sum(x[matched == i])
     
   }
-  
+  }
+    
   class(target) <- "MFobject"
   
   return(target)
