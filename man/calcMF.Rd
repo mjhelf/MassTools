@@ -4,7 +4,7 @@
 \alias{calcMF}
 \title{calcMF}
 \usage{
-calcMF(mz = 200.000659, z = 1, ppm = 5,
+calcMF(mz = 200.000659, z = 1, ppm = 5, top = NULL,
   elements = Rdisop::initializeCHNOPS(), maxCounts = T,
   SeniorRule = T, HCratio = T, moreRatios = T,
   elementHeuristic = T, Filters = list(DBErange = c(-5, 40),
@@ -19,6 +19,8 @@ calcMF(mz = 200.000659, z = 1, ppm = 5,
 \item{z}{charge (set 0 for uncharged)}
 
 \item{ppm}{error tolerance in ppm}
+
+\item{top}{if not NULL, maximum number of \code{top} formulas to be returned, as ranked by ppm error}
 
 \item{maxCounts}{check each predicted molecula formula for maximum number of elements expected in a natural product of its size ("Golden Rule #1")}
 
