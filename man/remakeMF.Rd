@@ -7,7 +7,7 @@
 remakeMF(x)
 }
 \arguments{
-\item{s}{Molecula formula string}
+\item{x}{Molecula formula string}
 }
 \description{
 Converts an element count vector back into a molecula formula string

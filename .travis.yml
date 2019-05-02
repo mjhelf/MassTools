@@ -6,23 +6,21 @@ cache: packages
 dist: trusty
 r:
 
-- release
-- bioc-release
 - bioc-devel
 
 warnings_are_errors: false
 
 bioc_required: true
 
-r_packages:
+r_packages: data.table
   
 
 bioc_packages: 
-  - Rdisop
-  - RcppClassic
-  
+  - BiocParallel
+
 r_github_packages:
   - r-lib/covr
+  - mjhelf/Rdisop
 
 after_success:
   - Rscript -e 'covr::codecov()'

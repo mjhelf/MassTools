@@ -4,10 +4,12 @@
 \alias{print.MFobject}
 \title{print.MFobject}
 \usage{
-\method{print}{MFobject}(s)
+\method{print}{MFobject}(x, ...)
 }
 \arguments{
-\item{s}{MFobject}
+\item{x}{MFobject}
+
+\item{...}{other arguments to \code{base::print()}}
 }
 \description{
 Print method for MFobject S3 class

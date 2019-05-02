@@ -15,11 +15,11 @@ is.MFobject <- function(a){
 #'
 #' Operator behavior for MFobject S3 class
 #' 
-#' @param a numeric or MFobject
-#' @param b numeric or MFobject
+#' @param e1 numeric or MFobject
+#' @param e2 numeric or MFobject
 #'
 #' @export
-Ops.MFobject <- function(a,b){
+Ops.MFobject <- function(e1,e2){
   
   if (nargs() == 1L){
     switch(.Generic,
@@ -32,8 +32,8 @@ Ops.MFobject <- function(a,b){
     
     
     
-  if(class(a) == "MFobject"
-    && class(b) == "MFobject"){
+  if(class(e1) == "MFobject"
+    && class(e2) == "MFobject"){
  switch(.Generic,
          `+` = NextMethod(),
          `-` = NextMethod(),
@@ -41,15 +41,15 @@ Ops.MFobject <- function(a,b){
          `/` = ,
          `!=` = any(NextMethod()),
          `==` = all(NextMethod()),
-         `<` = {a != b && all(a-b <= 0)},
-         `>` = {a != b && all(a-b >= 0)},
-         `<=` = {a == b || all(a-b <= 0)},
-         `>=` = {a == b || all(a-b >= 0)}
+         `<` = {e1 != e2 && all(e1-e2 <= 0)},
+         `>` = {e1 != e2 && all(e1-e2 >= 0)},
+         `<=` = {e1 == e2 || all(e1-e2 <= 0)},
+         `>=` = {e1 == e2 || all(e1-e2 >= 0)}
          
   )
  
  
-  }else if(class(a) != class(b)){
+  }else if(class(e1) != class(e2)){
   
    NextMethod() 
     
@@ -60,12 +60,13 @@ Ops.MFobject <- function(a,b){
 #'
 #' Print method for MFobject S3 class
 #' 
-#' @param s MFobject
+#' @param x MFobject
+#' @param ... other arguments to \code{base::print()}
 #'
 #' @export
-print.MFobject <- function(s){
+print.MFobject <- function(x, ...){
 
-   print(remakeMF(s))
+   print(remakeMF(x), ...)
    
 }
 

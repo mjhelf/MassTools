@@ -4,12 +4,12 @@
 \alias{Ops.MFobject}
 \title{Ops.MFobject}
 \usage{
-\method{Ops}{MFobject}(a, b)
+\method{Ops}{MFobject}(e1, e2)
 }
 \arguments{
-\item{a}{numeric or MFobject}
+\item{e1}{numeric or MFobject}
 
-\item{b}{numeric or MFobject}
+\item{e2}{numeric or MFobject}
 }
 \description{
 Operator behavior for MFobject S3 class

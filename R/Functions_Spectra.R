@@ -9,7 +9,7 @@
 #' @param mzdiff min difference between peaks in m/z
 #'
 #' @export
-mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005, removeNoise = NULL, count = F){
+mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005){
   
   if(length(speclist) == 0){return(NULL)}
   

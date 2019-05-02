@@ -4,8 +4,7 @@
 \alias{mergeMS}
 \title{mergeMS}
 \usage{
-mergeMS(speclist, ppm = 5, mzdiff = 5e-04, removeNoise = NULL,
-  count = F)
+mergeMS(speclist, ppm = 5, mzdiff = 5e-04)
 }
 \arguments{
 \item{speclist}{list of spectra (matrix with mz and intensity values)}

@@ -98,7 +98,7 @@ makeMF <- function(s, forcelist = F){
 #'
 #' Converts an element count vector back into a molecula formula string
 #' 
-#' @param s Molecula formula string
+#' @param x Molecula formula string
 #'
 #' @export
 remakeMF <- function(x){
