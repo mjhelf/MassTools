@@ -5,13 +5,12 @@
 \title{calcMF}
 \usage{
 calcMF(mz = 200.000659, z = 1, ppm = 5, top = NULL,
-  elements = Rdisop::initializeCHNOPS(), maxCounts = T,
-  SeniorRule = T, HCratio = T, moreRatios = T,
-  elementHeuristic = T, Filters = list(DBErange = c(-5, 40),
-  minElements = "C0H0P0S0N0O0", maxElements =
-  "C9999H9999P9999S9999N9999O9999", parity = "e", maxCounts = T, SENIOR3 =
-  0, HCratio = T, moreRatios = T, elementHeuristic = T), summarize = F,
-  BPPARAM = NULL)
+  elements = Rdisop::initializeCHNOPS(), maxCounts = TRUE,
+  SeniorRule = TRUE, HCratio = TRUE, moreRatios = TRUE,
+  elementHeuristic = TRUE, Filters = list(DBErange = c(-5, 40),
+  minElements = "C0", maxElements = "C99999", parity = "e", maxCounts =
+  TRUE, SENIOR3 = 0, HCratio = TRUE, moreRatios = TRUE, elementHeuristic =
+  TRUE), summarize = FALSE, BPPARAM = NULL)
 }
 \arguments{
 \item{mz}{monoisotopic mass or monoisotopic m/z value}

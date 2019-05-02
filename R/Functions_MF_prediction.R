@@ -39,7 +39,6 @@
 #'    \item{elementHeuristic}{If \code{TRUE}, additional element ratio heuristic is applied ("Golden Rule #6") [1]}
 #' }}
 #' 
-#' @importFrom data.table rbindlist as.data.table data.table
 #' @importFrom Rdisop decomposeMass initializeCHNOPS
 #' @importFrom BiocParallel bplapply SerialParam
 #' 
@@ -49,87 +48,74 @@ calcMF <- function(mz = 200.000659,
                    ppm = 5,
                    top = NULL,
                    elements = Rdisop::initializeCHNOPS(),
-                   maxCounts = T,
-                   SeniorRule = T,
-                   HCratio = T,
-                   moreRatios = T,
-                   elementHeuristic = T,
+                   maxCounts = TRUE,
+                   SeniorRule = TRUE,
+                   HCratio = TRUE,
+                   moreRatios = TRUE,
+                   elementHeuristic = TRUE,
                    Filters = list(DBErange = c(-5,40),
-                                  minElements = "C0H0P0S0N0O0",
-                                  maxElements = "C9999H9999P9999S9999N9999O9999",
+                                  minElements = "C0",
+                                  maxElements = "C99999",
                                   parity = "e",
-                                  maxCounts = T,
+                                  maxCounts = TRUE,
                                   SENIOR3 = 0,
-                                  HCratio = T,
-                                  moreRatios = T,
-                                  elementHeuristic = T),
-                   summarize = F,
+                                  HCratio = TRUE,
+                                  moreRatios = TRUE,
+                                  elementHeuristic = TRUE),
+                   summarize = FALSE,
                    BPPARAM = NULL
 ){
   
-  if(is.null(Filters$minElements)){
-        #do nothing
+  if(is.null(Filters$minElements) || !is.character(Filters$minElements)
+     || is.na(Filters$minElements) || Filters$minElements == ""){
+    Filters$minElements <- "C0"
   }
-  else if(is.MFobject(Filters$minElements)){
-    
-  } else if(is.character(Filters$minElements) && length(Filters$minElements) ==1){
-    Filters$minElements <- makeMF(Filters$minElements)
-  }else{simpleError("Filters$minElements format is not correct")}
   
   
-  if(is.null(Filters$minElements)){
-    #do nothing
+  if(is.null(Filters$maxElements) || !is.character(Filters$maxElements)
+     || is.na(Filters$maxElements) || Filters$maxElements == ""){
+    Filters$maxElements <- "C99999"
   }
-  else if(is.MFobject(Filters$maxElements)){
-    
-   Filters$maxElements[Filters$maxElements==0] <- Inf
-    
-  } else if(is.character(Filters$maxElements) && length(Filters$maxElements) ==1){
-    Filters$maxElements <- makeMF(Filters$maxElements)
-    Filters$maxElements[Filters$maxElements==0] <- Inf
-    
-  }else{simpleError("Filters$minElements format is not correct")}
   
- 
   
   
   if(is.null(elements)){
     
-   
-    elements = initializeCHNOPS()
-  
     
-    }else if(is.character(elements)){
-     #if character formula is given, e.g. "CHOPS"
-      
-     elements <- makeMF(elements)
-     
-     elements <- initializeElements( names(elements)[elements>0])
-       
-    }
+    elements = initializeCHNOPS()
+    
+    
+  }else if(is.character(elements)){
+    #if character formula is given, e.g. "CHOPS"
+    
+    elements <- makeMF(elements)
+    
+    elements <- initializeElements( names(elements)[elements>0])
+    
+  }
   
   if(length(mz)>1){
     
-  
-   rl <- bplapply(mz,calcMF,
-           z = z,
-           ppm = ppm,
-           elements = elements,
-           maxCounts = maxCounts,
-           SeniorRule = SeniorRule,
-           HCratio = HCratio,
-           moreRatios = moreRatios,
-           elementHeuristic = elementHeuristic,
-           Filters = Filters,
-           summarize = summarize,
-           BPPARAM=if(is.null(BPPARAM)){SerialParam()}else{BPPARAM})
     
-   if(summarize){
-   return(unlist(rl))
-   }else{
-   return(rl)
-     }
-     
+    rl <- bplapply(mz,calcMF,
+                   z = z,
+                   ppm = ppm,
+                   elements = elements,
+                   maxCounts = maxCounts,
+                   SeniorRule = SeniorRule,
+                   HCratio = HCratio,
+                   moreRatios = moreRatios,
+                   elementHeuristic = elementHeuristic,
+                   Filters = Filters,
+                   summarize = summarize,
+                   BPPARAM=if(is.null(BPPARAM)){SerialParam()}else{BPPARAM})
+    
+    if(summarize){
+      return(unlist(rl))
+    }else{
+      return(rl)
+    }
+    
   }
   
   
@@ -144,7 +130,13 @@ calcMF <- function(mz = 200.000659,
   
   
   
-  mm <- decomposeMass(mz, z = z, maxisotopes = 1, ppm = ppm, elements = elements)
+  mm <- decomposeMass(mz, z = z, 
+                      maxisotopes = 1, 
+                      ppm = ppm, 
+                      mzabs = 0,
+                      elements = elements,
+                      minElements = Filters$minElements,
+                      maxElements = Filters$maxElements)
   
   if(is.null(mm)){return(failReturn)}
   
@@ -156,7 +148,7 @@ calcMF <- function(mz = 200.000659,
   
   if(!any(f1)){return(failReturn)}
   
-
+  
   f1 <- which(f1)
   
   if(length(f1) == 0){return(failReturn)}
@@ -165,17 +157,24 @@ calcMF <- function(mz = 200.000659,
   f2 <- f1[order(abs(mm$exactmass[f1] - z*5.48579909070e-4 - mz))]
   
   
-  sfs <- makeMF(mm$formula[f2], forcelist = T)
+  sfs <- makeMF(mm$formula[f2], forcelist = TRUE)
   
-  ret <- if(!is.null(Filters$minElements)){sapply(sfs,">=", Filters$minElements)}else{T} & if(!is.null(Filters$maxElements)){sapply(sfs,"<=", Filters$maxElements)}else{T}
+  # ret <- if(!is.null(Filters$minElements)){
+  #   sapply(sfs,">=", Filters$minElements)
+  # }else{
+  #     T
+  # } & if(!is.null(Filters$maxElements)){
+  #     sapply(sfs,"<=", Filters$maxElements)
+  # }else{
+  #     T}
+  # 
+  # if(!any(ret)){return(failReturn)}
+  # 
+  # #remove formulas not meeting min and max expectations
+  # f2 <- f2[ret]
+  # sfs <- sfs[ret]
   
-  if(!any(ret)){return(failReturn)}
-  
-  #remove formulas not meeting min and max expectations
-  f2 <- f2[ret]
-  sfs <- sfs[ret]
-  
-  res <- data.table(mz = mm$exactmass[f2] - z*5.48579909070e-4,
+  res <- data.frame(mz = mm$exactmass[f2] - z*5.48579909070e-4,
                     MF = mm$formula[f2],
                     charge = z,
                     RdisopScore = mm$score[f2],
@@ -183,7 +182,7 @@ calcMF <- function(mz = 200.000659,
                     parity = mm$parity[f2],
                     error = mm$exactmass[f2] - z*5.48579909070e-4 - mz,
                     nrule = mm$valid[f2],
-                    stringsAsFactors = F)
+                    stringsAsFactors = FALSE)
   
   res$ppm <- res$error/mz *1e6
   
@@ -210,7 +209,7 @@ calcMF <- function(mz = 200.000659,
       
       
     }else{
-      res$maxCounts <- T
+      res$maxCounts <- TRUE
     }
     
     if(!is.null(Filters$maxCounts) && Filters$maxCounts){
@@ -317,20 +316,20 @@ calcMF <- function(mz = 200.000659,
       r2 <- r1[r1>1]
       
       #if two of these elements are not in the molecule, don't apply restrictions
-      if(length(r2) <= 2){return(T)}
+      if(length(r2) <= 2){return(TRUE)}
       
       if(length(r2) == 4 
          && (r2["N"] >=10
              || r2["O"] >=20
              ||r2["P"] >=4
-             ||r2["S"] >=3)){return(F)}
+             ||r2["S"] >=3)){return(FALSE)}
       
       switch(paste(names(r2), collapse = ""),
-             NOP = {if(min(r2) > 3 && (r2["N"] >=11 || r2["O"] >=22 || r2["P"] >=7)){return(F)}},
-             OPS = {if(min(r2) > 1 && (r2["S"] >=3 || r2["O"] >=14 || r2["P"] >=3)){return(F)}},                                                                            NPS = {if(min(r2) > 1 && (r2["N"] >=4 || r2["S"] >=3 || r2["P"] >=3)){return(F)}},
-             NOS = {if(min(r2) > 6 && (r2["S"] >=8 || r2["O"] >=14 || r2["N"] >=19)){return(F)}})
+             NOP = {if(min(r2) > 3 && (r2["N"] >=11 || r2["O"] >=22 || r2["P"] >=7)){return(FALSE)}},
+             OPS = {if(min(r2) > 1 && (r2["S"] >=3 || r2["O"] >=14 || r2["P"] >=3)){return(FALSE)}},                                                                            NPS = {if(min(r2) > 1 && (r2["N"] >=4 || r2["S"] >=3 || r2["P"] >=3)){return(F)}},
+             NOS = {if(min(r2) > 6 && (r2["S"] >=8 || r2["O"] >=14 || r2["N"] >=19)){return(FALSE)}})
       
-      return(T)
+      return(TRUE)
       
       
     })
@@ -355,7 +354,7 @@ calcMF <- function(mz = 200.000659,
     
     res <- res[seq(min(top,nrow(res))),]
     
-    }
+  }
   
   if(summarize){
     

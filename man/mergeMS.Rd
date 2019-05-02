@@ -4,14 +4,16 @@
 \alias{mergeMS}
 \title{mergeMS}
 \usage{
-mergeMS(speclist, ppm = 5, mzdiff = 5e-04)
+mergeMS(speclist, ppm = 5, mzdiff = 5e-04, count = FALSE)
 }
 \arguments{
-\item{speclist}{list of spectra (matrix with mz and intensity values)}
+\item{speclist}{list of spectra (matrices, all with two columns: \code{mz} and \code{intensity})}
 
 \item{ppm}{min difference between peaks in ppm}
 
 \item{mzdiff}{min difference between peaks in m/z}
+
+\item{count}{if TRUE, will count how many peaks were combined into a peak, and add a \code{count} column in the resulting spectrum}
 }
 \description{
 Merge MS spectra, best used with noise-free spectra. Will merge all peaks that are EITHER within ppm OR within mzdiff range (mzdiff typically used to allow larger ppm difference in low mz range)

@@ -4,10 +4,10 @@
 \alias{is.MFobject}
 \title{Ops.MFobject}
 \usage{
-is.MFobject(a)
+is.MFobject(object)
 }
 \arguments{
-\item{a}{object}
+\item{object}{object to check}
 }
 \description{
 Check if an object is a correctly formed MFobject

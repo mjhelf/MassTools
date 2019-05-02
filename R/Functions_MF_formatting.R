@@ -41,7 +41,7 @@ consolidateMF <- function(x){
   
   target <- getOption("MassTools.elements")
   
-  x <- unclass(x)
+ # x <- unclass(x)
   
   matched <- match(names(x),names(target))
   

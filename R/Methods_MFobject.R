@@ -2,12 +2,12 @@
 #'
 #' Check if an object is a correctly formed MFobject
 #' 
-#' @param a object
+#' @param object object to check
 #'
 #' @export
-is.MFobject <- function(a){
+is.MFobject <- function(object){
   
- class(a) == "MFobject" && is.numeric(a) && !is.null(names(a)) && !any(duplicated(names(a)))
+  is(object, "MFobject") && is.numeric(object) && !is.null(names(object)) && !any(duplicated(names(object)))
 }
 
 
@@ -28,32 +28,32 @@ Ops.MFobject <- function(e1,e2){
     )
     
   }else{
-  
     
     
     
-  if(class(e1) == "MFobject"
-    && class(e2) == "MFobject"){
- switch(.Generic,
-         `+` = NextMethod(),
-         `-` = NextMethod(),
-         `*` = ,
-         `/` = ,
-         `!=` = any(NextMethod()),
-         `==` = all(NextMethod()),
-         `<` = {e1 != e2 && all(e1-e2 <= 0)},
-         `>` = {e1 != e2 && all(e1-e2 >= 0)},
-         `<=` = {e1 == e2 || all(e1-e2 <= 0)},
-         `>=` = {e1 == e2 || all(e1-e2 >= 0)}
-         
-  )
- 
- 
-  }else if(class(e1) != class(e2)){
-  
-   NextMethod() 
     
-  }}
+    if(is.MFobject(e1)
+       && is.MFobject(e2)){
+      switch(.Generic,
+             `+` = NextMethod(),
+             `-` = NextMethod(),
+             `*` = ,
+             `/` = ,
+             `!=` = any(NextMethod()),
+             `==` = all(NextMethod()),
+             `<` = {e1 != e2 && all(e1-e2 <= 0)},
+             `>` = {e1 != e2 && all(e1-e2 >= 0)},
+             `<=` = {e1 == e2 || all(e1-e2 <= 0)},
+             `>=` = {e1 == e2 || all(e1-e2 >= 0)}
+             
+      )
+      
+      
+    }else{
+      
+      NextMethod() 
+      
+    }}
 }
 
 #' print.MFobject
@@ -65,9 +65,9 @@ Ops.MFobject <- function(e1,e2){
 #'
 #' @export
 print.MFobject <- function(x, ...){
-
-   print(remakeMF(x), ...)
-   
+  
+  print(remakeMF(x), ...)
+  
 }
 
 #' getSenior3
