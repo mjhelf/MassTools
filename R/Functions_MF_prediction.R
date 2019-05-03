@@ -42,6 +42,13 @@
 #' @importFrom Rdisop decomposeMass initializeCHNOPS
 #' @importFrom BiocParallel bplapply SerialParam
 #' 
+#' @return a data.frame (or list of data.frames if multiple mz values are supplied) with molecular formulas generated with \link[Rdisop]{decomposeMass}() with additional information 
+#' and optionally filtered as described. NOTE: If \code{summarize = TRUE}, results for each query mz value are summarized in a single character string with all molecular formulas matching filter criteria
+#' 
+#' @examples 
+#' 
+#' calcMF(mz = 200.000659, z = 1, ppm = 5)
+#' 
 #' @export
 calcMF <- function(mz = 200.000659,
                    z = 1,

@@ -39,6 +39,10 @@ calcMF(mz = 200.000659, z = 1, ppm = 5, top = NULL,
 
 \item{BPPARAM}{parameters for parallel processing with \pkg{BiocParallel}. Can be \link[BiocParallel]{bpparam}(), or an object of these classes \link[BiocParallel]{SnowParam-class}, \link[BiocParallel]{MulticoreParam-class}. If NULL, \link[BiocParallel]{SerialParam}() is called (no multicore processing).}
 }
+\value{
+a data.frame (or list of data.frames if multiple mz values are supplied) with molecular formulas generated with \link[Rdisop]{decomposeMass}() with additional information 
+and optionally filtered as described. NOTE: If \code{summarize = TRUE}, results for each query mz value are summarized in a single character string with all molecular formulas matching filter criteria
+}
 \description{
 Calculate molecular formulas from a monoisotopic mass. This function uses \pkg{Rdisop} to generate molecular formulas, and can apply many of the filters described as the "seven golden rules"[1]
 }
@@ -57,6 +61,11 @@ These filtering steps can be selected. Filter items that are NULL (or not in the
    \item{moreRatios}{If \code{TRUE}, molecular formulas must have these atom count ratios: Nitrogen/Carbon <1.3, Oxygen/Carbon <1.2, Phosphorus/Carbon <0.3 and Sulfur/Carbon <0.8 ("Golden Rule #5")[1]. Will be ignored if no Carbon present in a molecule.}
    \item{elementHeuristic}{If \code{TRUE}, additional element ratio heuristic is applied ("Golden Rule #6") [1]}
 }}
+}
+\examples{
+
+calcMF(mz = 200.000659, z = 1, ppm = 5)
+
 }
 \references{
 \enumerate{
