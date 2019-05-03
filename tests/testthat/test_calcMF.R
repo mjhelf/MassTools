@@ -29,3 +29,53 @@ test_that("calcMF correctly passes through Rdisop::decomposeMass results",{
  
   
 })
+
+test_that("calcMF works with multiple mz inputs",{
+  
+
+  expect_that(calcMF(mz = 200.000659,
+                     z = 1,
+                     ppm = 5) , equals(calcMF(mz = c(200.000659,
+                                                     200.000659),
+                                              z = 1,
+                                              ppm = 5)[[1]]))
+  
+  
+})
+
+test_that("calcMF works with parallel processing",{
+  
+  BiocParallel::register(BiocParallel::bpstart(if(Sys.info()['sysname'] == "Windows"){BiocParallel::SnowParam()}else{BiocParallel::MulticoreParam()}))
+  
+  
+  expect_that(calcMF(mz = 200.000659,
+                     z = 1,
+                     ppm = 5) , equals(calcMF(mz = c(200.000659,
+                                                     200.000659),
+                                              z = 1,
+                                              ppm = 5,
+                                              BPPARAM = BiocParallel::bpparam())[[1]]))
+  
+  
+})
+
+
+test_that("calcMF summarize works correctly",{
+  
+
+  expect_that(paste(calcMF(mz = 200.000659,
+                     z = 1,
+                     ppm = 5)$MF,"(+1)", sep = "", collapse = "|") , 
+              equals(calcMF(mz = 200.000659,
+                                              z = 1,
+                                              ppm = 5,
+                            summarize = TRUE)))
+  
+  
+})
+
+
+test_that("calcMF filters correctly",{
+
+  
+})
