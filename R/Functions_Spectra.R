@@ -8,32 +8,55 @@
 #' @param ppm min difference between peaks in ppm
 #' @param mzdiff min difference between peaks in m/z
 #' @param count if TRUE, will count how many peaks were combined into a peak, and add a \code{count} column in the resulting spectrum
+#' @param iterative if TRUE, will iteratively merge two adjacent peaks within tolerance, 
+#' and then check if there are peaks within tolerance of merged peak
+#' @param removeZeros remove all entries with 0 intensity 
 #'
 #' @export
-mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005, count = FALSE){
+mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
+                    count = FALSE, iterative = T,
+                    removeZeros = T){
   
-  if(length(speclist) == 0){return(NULL)}
+  if(length(speclist) == 0){return(matrix(numeric(0),ncol = 2, dimnames = list(NULL,c("mz", "intensity"))))}
   
-  if(is.list(speclist)){
-    aspec <- do.call(rbind,speclist)
+  if(is.list(speclist) || is(speclist,"Spectra")){
+    
+    if(is(speclist[[1]],"Spectrum")){
+      SpectrumOut <- speclist[[1]]
+      
+      aspec <- do.call(rbind,lapply(speclist, function(x){matrix(c(x@mz, x@intensity),ncol = 2)}))
+      
+
+      }else{
+       SpectrumOut <- NULL 
+       
+           aspec <- do.call(rbind,speclist)
+
+      }
+      
+
+    
   }else{
+    SpectrumOut <- NULL 
+    
     aspec <- speclist
     
   }
   
-  #lots of safeguards
-  if(is.null(aspec)){return(NULL)}
+  #safeguards
+  if(is.null(aspec)){return(matrix(numeric(0),ncol = 2, dimnames = list(NULL,c("mz", "intensity"))))}
   
   
   #remove 0 intensity peaks because they will produce NaN mz values downstream
   
+  if(removeZeros){
     aspec <- aspec[aspec[,2] != 0,, drop = FALSE]
+  }
+  
+  #if(length(aspec) == 0){return(NULL)}
   
   
-  if(length(aspec) == 0){return(NULL)}
-  
-  
-  if(nrow(aspec) != 1){
+  if(nrow(aspec) > 1){
     aspec <- aspec[order(aspec[,1]),]
   }else{
    return(aspec) 
@@ -57,9 +80,26 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005, count = FALSE){
     #index of first peak in a group that is belowmargin, peaks following a first peak belowmargin should not count
     #should dorectly translate to index in aspec..
   firsts <- which( !c(FALSE,belowmargin[-length(belowmargin)]) & belowmargin)
+  
+  if(iterative){
   seconds <- firsts + 1
+  }else{
+    #finding the last entry in the group, iterative aggregation will merge all
+    #into one without the "mz walking" iterative effect
+  seconds <- which(belowmargin & !c(belowmargin[-1], FALSE))
+    
+  }
+  
+ 
   
   sumints <- (aspec[firsts,2] + aspec[seconds,2]) #intensity mean
+  
+  
+   if(!removeZeros && any(sumints == 0)){
+     rem <- which(sumints == 0)
+     firsts <- firsts[-rem]
+     seconds <- seconds[-rem]
+     }
   
   aspec[firsts,1] <-   (aspec[firsts,1]*aspec[firsts,2] + aspec[seconds,1]*aspec[seconds,2]) / sumints #mz weighted average
   
@@ -90,6 +130,17 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005, count = FALSE){
   aspec[,2] <- aspec[,2]/length(speclist)
   }
   
+  if(!is.null(SpectrumOut)){
+    
+    SpectrumOut@mz <- aspec[,1]
+    SpectrumOut@intensity <- aspec[,2]
+    
+    SpectrumOut@peaksCount <- nrow(aspec)
+  
+    return(SpectrumOut)
+  }
+    
+    
   return(aspec)
   
 }
