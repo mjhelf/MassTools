@@ -130,7 +130,7 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
   aspec[,2] <- aspec[,2]/length(speclist)
   }
   
-  if(!is.null(SpectrumOut)){
+  if(exists("SpectrumOut") && !is.null(SpectrumOut)){
     
     SpectrumOut@mz <- aspec[,1]
     SpectrumOut@intensity <- aspec[,2]
