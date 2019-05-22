@@ -67,7 +67,7 @@ consolidateMF <- function(x){
 
 #' makeMF
 #'
-#' Reformat a molecula formula string into an element count vector
+#' construct an MFobject from a molecula formula string
 #' 
 #' @param s Molecula formula string
 #' @param forcelist if \code{TRUE}, will always return a list, even when s is of length 1.
@@ -94,7 +94,7 @@ makeMF <- function(s, forcelist = F){
     
 }
 
-#''remakeMF
+#' remakeMF
 #'
 #' Converts an element count vector back into a molecula formula string
 #' 
@@ -106,3 +106,4 @@ remakeMF <- function(x){
   return(paste(names(x[x!=0]), gsub("^1$","",x[x!=0]), collapse = "", sep = ""))
   
 }
+

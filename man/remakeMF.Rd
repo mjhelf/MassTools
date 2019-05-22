@@ -2,7 +2,7 @@
 % Please edit documentation in R/Functions_MF_formatting.R
 \name{remakeMF}
 \alias{remakeMF}
-\title{'remakeMF}
+\title{remakeMF}
 \usage{
 remakeMF(x)
 }

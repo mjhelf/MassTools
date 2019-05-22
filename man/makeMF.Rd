@@ -12,5 +12,5 @@ makeMF(s, forcelist = F)
 \item{forcelist}{if \code{TRUE}, will always return a list, even when s is of length 1.}
 }
 \description{
-Reformat a molecula formula string into an element count vector
+construct an MFobject from a molecula formula string
 }
