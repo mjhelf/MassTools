@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{molecular formula as an MFobject}
+
+\item{...}{additional arguments to \code{\link[Rdisop]{getMolecule}}}
 }
 \description{
 getExactMass.MFobject

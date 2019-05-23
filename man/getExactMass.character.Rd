@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{molecular formula as a character()}
+
+\item{...}{additional arguments to \code{\link[Rdisop]{getMolecule}}}
 }
 \description{
 getExactMass.character

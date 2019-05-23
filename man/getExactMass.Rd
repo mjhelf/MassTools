@@ -8,6 +8,8 @@ getExactMass(x, ...)
 }
 \arguments{
 \item{x}{molecular formula as a character() or MFobject}
+
+\item{...}{additional arguments to \code{\link[Rdisop]{getMolecule}}}
 }
 \description{
 get the exact mass of a molecule
