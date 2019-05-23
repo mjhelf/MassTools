@@ -96,6 +96,7 @@ getSenior3.MFobject <- function(MF){
 #' get the exact mass of a molecule
 #' 
 #' @param x molecular formula as a character() or MFobject
+#' @param ... additional arguments to \code{\link[Rdisop]{getMolecule}}
 #' 
 #' @export
 getExactMass <- function(x, ...){
@@ -108,6 +109,7 @@ getExactMass <- function(x, ...){
 #' getExactMass.character
 #' 
 #' @param x molecular formula as a character()
+#' @param ... additional arguments to \code{\link[Rdisop]{getMolecule}}
 #' 
 #' @importFrom Rdisop getMolecule
 #' @export
@@ -127,6 +129,7 @@ getExactMass.character <- function(x, ...){
 #' getExactMass.MFobject
 #' 
 #' @param x molecular formula as an MFobject
+#' @param ... additional arguments to \code{\link[Rdisop]{getMolecule}}
 #' 
 #' @export
 getExactMass.MFobject <- function(x, ...){
