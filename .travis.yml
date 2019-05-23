@@ -5,8 +5,10 @@ sudo: required
 cache: packages
 dist: trusty
 r:
-
 - bioc-devel
+- bioc-release
+- release
+- devel
 
 warnings_are_errors: true
 
