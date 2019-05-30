@@ -18,7 +18,7 @@ PeptideMF <- function(seq, AAs = c("A" = "C3H7NO2",  "R" = "C6H14N4O2",  "N" = "
   seq <- gsub("[[:space:]]","",seq)
   
   pepAAs <- strsplit(seq, split = "")
-  Ecounts <- lapply(pepAAs, function(p){makeMF(paste0(paste(AAs[p], collapse = ""),"H2O"))})
+  Ecounts <- lapply(pepAAs, function(p){makeMF(paste0(paste(AAs[p], collapse = ""),paste(rep("H-2O-1",length(p)-1), collapse = "") ))})
   
   return(Ecounts)
 }

@@ -11,10 +11,6 @@ warnings_are_errors: true
 
 bioc_required: true
 
-script: 
-  - R -e 'install.packages("BiocManager")'
-  - R -e 'BiocManager::install(version = "3.9")'  
-  
 bioc_packages: 
   - BiocParallel
 
