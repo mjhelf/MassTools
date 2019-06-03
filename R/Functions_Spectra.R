@@ -144,3 +144,45 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
   return(aspec)
   
 }
+
+
+#' annotateSpectrum
+#'
+#' Match peaks in a spectrum with those in a labeling data.frame 
+#' and prepare them for plotting functions. Matches have to be within abs OR ppm 
+#'
+#' @param labels a data.frame as returned by permutatePeptideMass
+#' @param spectrum a mass spectrum as data.frame or matrix
+#' @param ppm relative matching tolerance in ppm
+#' @param abs matching tolerance in absolute numbers 
+#'
+#'
+#'@export
+annotateSpectrum <- function(labels, spectrum,
+                             mzlabel = F,
+                             unmodifiedTag = "",
+                             ppm = 5,
+                             abs = 0
+                             ){
+  
+  
+  foundpeaks <- matchNumbers(labels$mz, spectrum[,1], ppm = ppm, abs = abs)
+  
+  foundpeaks_annotated <- cbind(as.data.frame(spectrum)[foundpeaks[,2],],
+                                labels[foundpeaks[,1],])
+  
+  colnames(foundpeaks_annotated)[1:2] <- c("mzSpec","intensitySpec")
+  
+  foundpeaks_annotated$color <- "blue3"
+  
+  foundpeaks_annotated$label <- gsub("\\[\\]"," ",paste0(foundpeaks_annotated$type,
+                                       "[",foundpeaks_annotated$pos,
+                                       "]","^{+{}}*", ' "[',
+                                       gsub("^$",unmodifiedTag,
+                                            foundpeaks_annotated$modifications),
+                                       ']"',
+                                       if(mzlabel){paste0("(",format(round(foundpeaks_annotated$mzSpec,4),nsmall = 4, scientific = F),")")}else{""}
+  ))
+  
+  return(foundpeaks_annotated)
+}
