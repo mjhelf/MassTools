@@ -12,9 +12,16 @@ annotateSpectrum(labels, spectrum, mzlabel = F, unmodifiedTag = "",
 
 \item{spectrum}{a mass spectrum as data.frame or matrix}
 
+\item{mzlabel}{if TRUE, will add mz values to the label}
+
+\item{unmodifiedTag}{what tag to use for unmodified fragment ions}
+
 \item{ppm}{relative matching tolerance in ppm}
 
 \item{abs}{matching tolerance in absolute numbers}
+}
+\value{
+plots an annotated peptide sequence in the current plotting device
 }
 \description{
 Match peaks in a spectrum with those in a labeling data.frame 

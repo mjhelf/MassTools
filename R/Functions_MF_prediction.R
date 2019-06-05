@@ -39,7 +39,7 @@
 #'    \item{elementHeuristic}{If \code{TRUE}, additional element ratio heuristic is applied ("Golden Rule #6") [1]}
 #' }}
 #' 
-#' @importFrom Rdisop decomposeMass initializeCHNOPS
+#' @importFrom Rdisop decomposeMass initializeCHNOPS initializeElements
 #' @importFrom BiocParallel bplapply SerialParam
 #' 
 #' @return a data.frame (or list of data.frames if multiple mz values are supplied) with molecular formulas generated with \link[Rdisop]{decomposeMass}() with additional information 

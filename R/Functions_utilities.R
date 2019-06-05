@@ -56,6 +56,11 @@ matchNumbers <- function(v1, v2, ppm = 5, abs = 0.001){
 permutateMass <- function(baseMass, modifications,
                           sep = "\\|", unmodifiedTag = ""){
   
+  if(!length(baseMass) 
+     || (is.data.frame(baseMass) && !nrow(baseMass))){
+    return( data.frame(mass = numeric(),
+                       modifications = character()))}
+  
   if(!is.data.frame(baseMass)){baseMass <- data.frame(mass = baseMass,
                                                       modifications = "")}
   

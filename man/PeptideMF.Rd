@@ -2,7 +2,9 @@
 % Please edit documentation in R/Functions_peptides.R
 \name{PeptideMF}
 \alias{PeptideMF}
-\title{PeptideMF}
+\title{PeptideMF
+
+convert peptide sequences into an MFobjects}
 \usage{
 PeptideMF(seq, AAs = c(A = "C3H7NO2", R = "C6H14N4O2", N = "C4H8N2O3", D
   = "C4H7NO4", C = "C3H7NO2S", Q = "C5H10N2O3", E = "C5H9NO4", G =
@@ -20,5 +22,7 @@ PeptideMF(seq, AAs = c(A = "C3H7NO2", R = "C6H14N4O2", N = "C4H8N2O3", D
 a list of MFobjects
 }
 \description{
+PeptideMF
+
 convert peptide sequences into an MFobjects
 }

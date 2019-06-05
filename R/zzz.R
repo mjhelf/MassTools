@@ -1,3 +1,10 @@
+#' @title MassTools
+#' @name MassTools
+#' @import utils methods graphics stats
+#'
+NULL
+
+
 .onLoad <- function(libname,pkgname){
   
   #if(!"MassTools.elements" %in% names(options())){

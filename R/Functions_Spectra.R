@@ -153,9 +153,12 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
 #'
 #' @param labels a data.frame as returned by permutatePeptideMass
 #' @param spectrum a mass spectrum as data.frame or matrix
+#' @param mzlabel if TRUE, will add mz values to the label
+#' @param unmodifiedTag what tag to use for unmodified fragment ions
 #' @param ppm relative matching tolerance in ppm
 #' @param abs matching tolerance in absolute numbers 
 #'
+#' @return plots an annotated peptide sequence in the current plotting device
 #'
 #'@export
 annotateSpectrum <- function(labels, spectrum,

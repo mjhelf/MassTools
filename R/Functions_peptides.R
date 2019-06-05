@@ -1,4 +1,4 @@
-#' PeptideMF
+#' @title PeptideMF
 #'
 #' convert peptide sequences into an MFobjects
 #' 
@@ -59,20 +59,30 @@ countAAs <- function(seq){
 #' modification masses)
 #' 
 #' @details 
-#' \subsection{modifications data.frame}{
-#' Columns that need to be in the modifications data.frame:
-#' \itemize{
-#' \item{AAs} containing letters for the amino acids (e.g. "TS") 
-#' affected by this modification
-#' \item{min} minimum number of times this modification can be applied
-#' \item{max} maximum number of times this modification can be applied
-#' \item{mass} mass of this modification
-#' \item{tag} label for this modification (will automatically be preceded by 
-#' number of these modifications applied)
+#' \subsection{modifications}{
+#' Columns that need to be in the \code{modifications data.frame}:
+#' \describe{
+#' \item{AAs}{containing letters for the amino acids (e.g. "TS")
+#' affected by this modification}
+#' \item{min}{minimum number of times this modification can be applied}
+#' \item{max}{maximum number of times this modification can be applied}
+#' \item{mass}{mass of this modification}
+#' \item{tag}{ label for this modification (will automatically be preceded by 
+#' number of these modifications applied)}
 #' }
 #' min and max can be positive, negative or 0. The larger *absolute* value has 
 #' to be in the \code{max} column
 #' }
+#' 
+#' @examples
+#' peptides = data.frame(seq = "ASDFGHKLIPYTREWQCNM",mz = 2295.056)
+#' mods = data.frame(AAs = c("TS", ""),
+#'  min = c(0,1), max = c(-10,2),
+#'   mass = c(18.01,12.0), tag = c("DH","C") )
+#' 
+#' permutatePeptideMass(peptides, mods)
+#'
+#' 
 #' @seealso \code{\link{permutateMass}}
 #' 
 #' @export
@@ -121,7 +131,6 @@ permutatePeptideMass <- function(df, modifications,
     if(!is.null(chargeCol)){
       modifications$mass <- modifications$mass/df[[chargeCol]][i]
     }
-    
     permutations <- permutateMass(df[[massCol]][i],modifications)
     
     colnames(permutations)[colnames(permutations) == "mass"] <- massCol
