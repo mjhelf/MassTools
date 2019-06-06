@@ -18,6 +18,8 @@ calcIons(MF, charges = c(1), carrier = "H", monoisotopic = T,
 will calculate m/z of the most abundant isotope peak otherwise (preferrable e.g. for large organic molecules)}
 
 \item{mf_column}{name of column in result data.frame that will contain the molecular formulas}
+
+\item{adduct}{an adduct, e.g. "Na" or "Cl". If the charge is positive, each adduct replaces one charge carrier.}
 }
 \value{
 a data.frame with columns \code{mz}, \code{charge}, \code{ion} and the \code{mf_column} as specified

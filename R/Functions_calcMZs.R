@@ -8,6 +8,7 @@
 #' @param monoisotopic if true, will calculate the monoisotopic mass m/z values, 
 #' will calculate m/z of the most abundant isotope peak otherwise (preferrable e.g. for large organic molecules)
 #' @param mf_column name of column in result data.frame that will contain the molecular formulas
+#' @param adduct an adduct, e.g. "Na" or "Cl". If the charge is positive, each adduct replaces one charge carrier.
 #' 
 #' @return a data.frame with columns \code{mz}, \code{charge}, \code{ion} and the \code{mf_column} as specified
 #'
@@ -24,13 +25,12 @@ calcIons <- function(MF, charges = c(1), carrier = "H",
     
   }else{
     
-    inpforms <- paste0(MF, paste(rep(paste0(carrier,"-1"), abs(charges[1])-length(adduct)), sep = "", collapse = ""), adduct)
+    inpforms <- paste0(MF, paste(rep(paste0(carrier,"-1"), abs(charges[1])), sep = "", collapse = ""), adduct)
     
     
   }
   
-  formulas <- check_chemform(isotopes,inpforms,get_sorted=FALSE,get_list=FALSE)
-  
+
   if(monoisotopic){
     
     mzs <- (getExactMass(inpforms) - 5.48579909070e-4*charges[1])/max(c(abs(charges[1]),1))
