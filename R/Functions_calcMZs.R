@@ -10,8 +10,6 @@
 #' @param mf_column name of column in result data.frame that will contain the molecular formulas
 #' 
 #' @return a data.frame with columns \code{mz}, \code{charge}, \code{ion} and the \code{mf_column} as specified
-#' 
-#' @importFrom enviPat check_chemform isopattern
 #'
 #' @export
 calcIons <- function(MF, charges = c(1), carrier = "H",
