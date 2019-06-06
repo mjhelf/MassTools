@@ -115,13 +115,24 @@ getExactMass <- function(x, ...){
 #' @export
 getExactMass.character <- function(x, ...){
   
-  return(
-    sapply(x,
+  x <- gsub("[[:space:]]","",x)
+  
+  
+   res <- sapply(x,
            function(x){
-             if(x == ""){return(NA)}
+             tryCatch({
+               if(x == ""){return(NA)}
+               if(length(grep("-",x))){
+                 getExactMass(makeMF(x))
+                 }else{
              getMolecule(x, ...)$isotopes[[1]][1]
+                   }
+             },
+             error = function(e){return(NA)})
            })
-  )
+   names(res) <- x
+   
+ return(res)
   
 }
 
@@ -141,3 +152,63 @@ getExactMass.MFobject <- function(x, ...){
   
 }
 
+#' getTopIsotope
+#' 
+#' get the mass of the most abundant isotope for a molecular formula
+#' 
+#' @details 
+#' Warning: if mixing positive and negative values in one molecular formula,
+#'  this may not give the correct result
+#' 
+#' @param x molecular formula as a character() or MFobject
+#' @param ... additional arguments to \code{\link[Rdisop]{getMolecule}}
+#' 
+#' @importFrom Rdisop getMolecule
+#' @export
+getTopIsotope <- function(x, ...){
+  
+  UseMethod("getTopIsotope",x)
+  
+}
+
+
+#' @export
+getTopIsotope.character <- function(x, ...){
+  
+  x <- gsub("[[:space:]]","",x)
+  
+  
+  res <- sapply(x,
+                function(x){
+                  tryCatch({
+                    if(x == ""){return(NA)}
+                    if(length(grep("-",x))){
+                      getTopIsotope(makeMF(x))
+                    }else{
+                      temp <- getMolecule(x, ...)$isotopes[[1]]
+                      return(temp[1,which.max(temp[2,])])
+                      
+                    }
+                  },
+                  error = function(e){
+                    warning(e)
+                    return(NA)
+                    })
+                })
+  names(res) <- x
+  
+  return(res)
+  
+}
+
+
+
+#' @export
+getTopIsotope.MFobject <- function(x, ...){
+  
+  plus <- if(any(x>0)){getTopIsotope(remakeMF(x[x>0], ...))}else{0}
+  minus <- if(any(x<0)){getTopIsotope(remakeMF(-x[x<0], ...))}else{0}
+
+  return(plus-minus)
+  
+}
