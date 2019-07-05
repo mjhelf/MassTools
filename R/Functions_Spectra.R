@@ -92,7 +92,7 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
   
  
   
-  sumints <- (aspec[firsts,2] + aspec[seconds,2]) #intensity mean
+  sumints <- (aspec[firsts,2] + aspec[seconds,2]) #intensity sum
   
   
    if(!removeZeros && any(sumints == 0)){
