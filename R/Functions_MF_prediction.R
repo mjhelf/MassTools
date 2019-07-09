@@ -41,6 +41,7 @@
 #' 
 #' @importFrom Rdisop decomposeMass initializeCHNOPS initializeElements
 #' @importFrom BiocParallel bplapply SerialParam
+#' @import stats methods utils
 #' 
 #' @return a data.frame (or list of data.frames if multiple mz values are supplied) with molecular formulas generated with \link[Rdisop]{decomposeMass}() with additional information 
 #' and optionally filtered as described. NOTE: If \code{summarize = TRUE}, results for each query mz value are summarized in a single character string with all molecular formulas matching filter criteria

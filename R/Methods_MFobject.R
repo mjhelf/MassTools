@@ -159,6 +159,9 @@ getExactMass.MFobject <- function(x, ...){
 #' @details 
 #' Warning: if mixing positive and negative values in one molecular formula,
 #'  this may not give the correct result
+#'  Warning: Default settings will not work correctly for very large molecules 
+#'  (specify \code{maxisotopes} to a value >200 if you expect the largest isotope peak (by intensity)
+#'   to be beyond the 200th smallest isotope peaks by mz) 
 #' 
 #' @param x molecular formula as a character() or MFobject
 #' @param ... additional arguments to \code{\link[Rdisop]{getMolecule}}
@@ -185,7 +188,15 @@ getTopIsotope.character <- function(x, ...){
                     if(length(grep("-",x))){
                       getTopIsotope(makeMF(x))
                     }else{
+                      
+                      if(length(list(...)) > 0 && "maxisotopes" %in% names(list(...))){
                       temp <- getMolecule(x, ...)$isotopes[[1]]
+                      }else{
+                        #200 max isotopes is a compromise between runtime and accuracy for large molecules
+                      temp <- getMolecule(x, maxisotopes = 200, ...)$isotopes[[1]]
+                        
+                        }
+                      
                       return(temp[1,which.max(temp[2,])])
                       
                     }

@@ -64,10 +64,19 @@ permutateMass <- function(baseMass, modifications,
   if(!is.data.frame(baseMass)){baseMass <- data.frame(mass = baseMass,
                                                       modifications = "")}
   
+  if((missing(modifications) 
+     || is.null(modifications) 
+     ||!nrow(modifications))
+     && !"modifications" %in% colnames(baseMass)){
+    baseMass$modifications <- ""
+    }
+  
   puresep <- gsub("\\\\","",sep)
   
   #base case for recursion
-  if(nrow(modifications) < 1){
+  if(missing(modifications) 
+     || is.null(modifications) 
+     || nrow(modifications) < 1){
     
     #remove separators that follow each other 
     baseMass$modifications <- gsub(paste0(sep,"{2,}"),puresep,

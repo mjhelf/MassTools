@@ -40,7 +40,11 @@ countAAs <- function(seq){
   
   uniques <- lapply(pepAAs, unique)
   
-  res <- mapply(function(u,p){counts <- sapply(u,function(aa){sum(p==aa)}); names(counts) <- u; return(counts)},uniques,pepAAs, SIMPLIFY = F)
+  res <- mapply(function(u,p){
+    counts <- sapply(u,function(aa){sum(p==aa)});
+    names(counts) <- u;
+    return(counts)},
+    uniques,pepAAs, SIMPLIFY = F)
   
   return(res)
 }
@@ -90,6 +94,18 @@ permutatePeptideMass <- function(df, modifications,
                                  sequenceCol = "seq", 
                                  massCol = "mz",
                                  chargeCol = NULL){
+  if((missing(modifications) 
+      || is.null(modifications) 
+      ||!nrow(modifications))
+     ){
+    
+    if(!"modifications" %in% colnames(df)){
+   df$modifications <- ""
+    }
+   
+   return(df)
+   
+  }
   
   res <-  lapply(seq(nrow(df)),function(i, modifications){
     

@@ -17,4 +17,7 @@ get the mass of the most abundant isotope for a molecular formula
 \details{
 Warning: if mixing positive and negative values in one molecular formula,
  this may not give the correct result
+ Warning: Default settings will not work correctly for very large molecules 
+ (specify \code{maxisotopes} to a value >200 if you expect the largest isotope peak (by intensity)
+  to be beyond the 200th smallest isotope peaks by mz)
 }
