@@ -7,9 +7,13 @@ test_that("peptide annotation works",{
   peptides = data.frame(seq = "ASDFGHKLIPYTREWQCNM",mz = bm, stringsAsFactors = F)
   mods = data.frame(AAs = c("TS", ""), min = c(0,1), max = c(-10,2), mass = c(18.01,12.0), tag = c("DH","C") )
  
-  unmodfrags <- MSnbase::calculateFragments(sequence = peptides$seq[1],
-                                            neutralLoss = list(water = character(0), ammonia = character(0)),
-                                            z = 1)
+  # Use these lines to remake the base fragments. using .rds file to avoid dependency for MSnbase (complicates Travis build)
+  # unmodfrags <- MSnbase::calculateFragments(sequence = peptides$seq[1],
+  #                                           neutralLoss = list(water = character(0), ammonia = character(0)),
+  #                                           z = 1)
+  #   saveRDS(unmodfrags, "testFragments.rds")
+
+    unmodfrags <- readRDS("testFragments.rds")
   
   fragments <- permutatePeptideMass(unmodfrags, mods )
   
