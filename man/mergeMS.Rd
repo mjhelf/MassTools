@@ -5,7 +5,7 @@
 \title{mergeMS}
 \usage{
 mergeMS(speclist, ppm = 5, mzdiff = 5e-04, count = FALSE,
-  iterative = T, removeZeros = T)
+  iterative = T, removeZeros = T, noiselevel = 0, maxpeaks = NULL)
 }
 \arguments{
 \item{speclist}{list of spectra (matrices, all with two columns: \code{mz} and \code{intensity})}
@@ -20,6 +20,12 @@ mergeMS(speclist, ppm = 5, mzdiff = 5e-04, count = FALSE,
 and then check if there are peaks within tolerance of merged peak}
 
 \item{removeZeros}{remove all entries with 0 intensity}
+
+\item{noiselevel}{all peaks below this intensity (relative to 
+highest peak in merged spectrum at relative intensity 1) will be removed}
+
+\item{maxpeaks}{if not NULL, maximum number of peaks in merged spectrum.
+Lowest intensity peaks will be removed from merged spectrum.}
 }
 \description{
 Merge MS spectra, best used with noise-free spectra. Will merge all peaks that are EITHER within ppm OR within mzdiff range (mzdiff typically used to allow larger ppm difference in low mz range)

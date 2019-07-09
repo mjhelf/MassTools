@@ -70,3 +70,26 @@ test_that("mergeMS counts combined peaks",{
   expect_that(c(count = 2), equals(mergeMS(list(MS1merge1), mzdiff = 50, count = T)[,3]))
   
 })
+
+test_that("mergeMS noise and maxpeaks arguments work",{
+  
+  MS2 <- matrix(c(100, 100.5, 101, 101.5,
+                  10, 100, 10000, 1000), ncol = 2, dimnames = list(NULL, c("mz","intensity")))
+  
+  #maxpeaks tests
+  expect_equal(mergeMS(MS2, maxpeaks = 9, noiselevel = 0),
+               MS2)
+  
+  expect_equal(mergeMS(MS2, maxpeaks = 2, noiselevel = 0),
+               MS2[3:4,])
+  
+  expect_equal(mergeMS(MS2, maxpeaks = 0, noiselevel = 0),
+               MS2[FALSE,])
+  
+  #noiselevel tests
+  expect_equal(mergeMS(MS2, maxpeaks = NULL, noiselevel = 0.1),
+               MS2[3:4,])
+  
+  expect_equal(mergeMS(MS2, maxpeaks = NULL, noiselevel = 10),
+               MS2[FALSE,])
+})

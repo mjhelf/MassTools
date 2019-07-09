@@ -11,11 +11,17 @@
 #' @param iterative if TRUE, will iteratively merge two adjacent peaks within tolerance, 
 #' and then check if there are peaks within tolerance of merged peak
 #' @param removeZeros remove all entries with 0 intensity 
+#' @param noiselevel all peaks below this intensity (relative to 
+#' highest peak in merged spectrum at relative intensity 1) will be removed 
+#' @param maxpeaks if not NULL, maximum number of peaks in merged spectrum.
+#' Lowest intensity peaks will be removed from merged spectrum.
 #'
 #' @export
 mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
                     count = FALSE, iterative = T,
-                    removeZeros = T){
+                    removeZeros = T,
+                    noiselevel = 0,
+                    maxpeaks = NULL){
   
   if(length(speclist) == 0){return(matrix(numeric(0),ncol = 2, dimnames = list(NULL,c("mz", "intensity"))))}
   
@@ -128,6 +134,21 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
   #the weight of the large peak gets "diluted" and the next large peak that it may be combined with is overrepresented
   if(is.list(speclist)){
   aspec[,2] <- aspec[,2]/length(speclist)
+  }
+  
+  if(noiselevel > 0){
+   
+    aspec <- aspec[aspec[,2] >= max(aspec[,2])*noiselevel,, drop = F]
+     
+  }
+  
+  if(!is.null(maxpeaks) && maxpeaks < nrow(aspec)){
+    if(maxpeaks < 1){
+     aspec <- aspec[FALSE,,drop = F] 
+    }else{
+    sel <- seq(nrow(aspec)) %in% na.omit(order(aspec[,2], decreasing = T)[seq(maxpeaks)])
+    aspec <- aspec[sel,, drop = F]
+    }
   }
   
   if(exists("SpectrumOut") && !is.null(SpectrumOut)){
