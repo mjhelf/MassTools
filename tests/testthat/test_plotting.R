@@ -1,7 +1,7 @@
 context("Plotting functions")
 
 
-test_that("peptide annotation works",{
+test_that("peptide annotation and plotting works",{
 
   bm <- 2295.056
   peptides = data.frame(seq = "ASDFGHKLIPYTREWQCNM",mz = bm, stringsAsFactors = F)
@@ -54,18 +54,13 @@ test_that("peptide annotation works",{
   expect_equal(permutatePeptideMass(unmodfrags, modifications = mods[logical(0),] ),
                unmodfrags2)
   
-  fragments2 <- permutatePeptideMass(unmodfrags, modifications = mods[logical(0),] )
-  
+
   annotation2 <- annotateSpectrum(unmodfrags2, data.frame(mz = unmodfrags2$mz,
                                                        intensity = 1000+  seq_along(unmodfrags2$mz)),
                                  mzlabel = F,
                                  unmodifiedTag = "",
                                  ppm = 5,
                                  abs = 0)
-
-})
-
-test_that("plotting an annotated peptide works",{
   
   
   expect_doppelganger("no_modifications",
@@ -83,5 +78,5 @@ test_that("plotting an annotated peptide works",{
                                            sortby = "intensitySpec",
                                            cx = 2,
                                            yoffset = 0))
-  
+
 })
