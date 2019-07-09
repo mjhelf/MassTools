@@ -17,6 +17,7 @@ Imports: BiocParallel,
     utils
 Suggests: covr,
     knitr,
+    MSnbase,
     rmarkdown,
     testthat,
     vdiffr
