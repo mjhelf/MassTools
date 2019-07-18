@@ -12,7 +12,7 @@ pairCompare(v1, v2, NAasZero = T, method = c("cosine", "pearson",
 
 \item{v2}{vector 2}
 
-\item{NAasZero}{replace NA values with 0}
+\item{NAasZero}{replace NA values with 0 if the value is NA in one vector, but not the other}
 
 \item{method}{"cosine" will use lsa::cosine(), "pearson" will use stats::cor()}
 }
@@ -21,5 +21,5 @@ the result of the method call, a numeric similarity score
 }
 \description{
 Compare two vectors of equal length pairwise and calculate a similarity 
-score (e.g. intensity values of matched MS peaks)
+score (e.g. intensity values of matched MS peaks).
 }

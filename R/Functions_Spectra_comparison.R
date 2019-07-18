@@ -123,10 +123,10 @@ network1 <- function(spec1, spec2, mztol = 0.005,
 #' @param speclist (non-nested) list of MS spectra
 #' @param parentmasses vector of parent m/z values (same length as speclist).
 #' @param mztol max difference between matched peaks in m/z
+#' @param method "cosine" will use lsa::cosine(), "pearson" will use stats::cor()
 #' @param minpeaks minimum number of peaks that have to be matched, otherwise returns 0
 #' @param nonmatched if TRUE, will add non-matching peaks to calculation, 
 #' with 0 intensity in the spectrum missing the peak
-#' @importFrom data.table data.table
 #' 
 #' @return a data.frame with edge information, see \code{Details}
 #' 

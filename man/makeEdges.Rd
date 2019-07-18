@@ -14,6 +14,8 @@ makeEdges(speclist, parentmasses = NULL, mztol = 0.005,
 
 \item{mztol}{max difference between matched peaks in m/z}
 
+\item{method}{"cosine" will use lsa::cosine(), "pearson" will use stats::cor()}
+
 \item{minpeaks}{minimum number of peaks that have to be matched, otherwise returns 0}
 
 \item{nonmatched}{if TRUE, will add non-matching peaks to calculation, 

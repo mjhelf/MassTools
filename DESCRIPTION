@@ -11,6 +11,7 @@ LazyData: true
 RoxygenNote: 6.1.1
 Imports: BiocParallel,
     graphics,
+    lsa,
     methods,
     Rdisop (>= 1.45.0),
     stats,
