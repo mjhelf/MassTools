@@ -52,14 +52,13 @@ pairCompare <- function(v1, v2, NAasZero = T,
 #'
 #' Compare two spectra and calculate a similarity score 
 #' (e.g. intensity values of matched MS peaks)
-#' NOTE: Current limitations: (1) peaks from one spectrum can match multiple 
-#' peaks from the other scan (workaround: call quickMergeMS with ppm = 0 and 
-#' mzdiff same as mzdiff here on both spectra prior to calling network1)
-#'
+#' NOTE: handling matching peaks from one spectrum that match multiple 
+#' peaks from the other spectrum is implemented now but needs testing
 #' 
 #' @param spec1 spectrum 1
 #' @param spec2 spectrum 2
-#' @param mztol allowed m/z difference between peaks to match matching
+#' @param mztol max m/z difference between peaks to match matching
+#' @param ppm max difference between peaks in ppm
 #' @param parentshift m/z difference between parentmasses (importantly, 
 #' has to be Parent(spec2) - Parent(spec1) ) to find alternative matches /
 #'  neutral loss matches; will only be calculated if \code{abs(parentshift) >  abs(mztol)}
@@ -73,39 +72,64 @@ pairCompare <- function(v1, v2, NAasZero = T,
 #' @return the result of the method call, a numeric similarity score
 #'
 #' @export
-network1 <- function(spec1, spec2, mztol = 0.005,
+network1 <- function(spec1, spec2,
+                     mztol = 0.005,
+                     ppm = 0,
                      parentshift = 0,
                      method = "cosine",
                      minpeaks = 6,
                      nonmatched = T){
   
-  posx <- which(abs(outer(spec1[,1], spec2[,1], "-")) < abs(mztol), arr.ind = T)
+  mx <- abs(outer(spec1[,1], spec2[,1], "-"))
+  
+  
+  
+  posx <- which(mx < abs(mztol) | mx/spec1[,1] < 1e-6*ppm, arr.ind = T)
   
   if(abs(parentshift) > abs(mztol)){
     
-    posx <- rbind(posx, which(abs(outer(spec1[,1]+parentshift, spec2[,1], "-")) < abs(mztol), arr.ind = T))
+    mx2 <- abs(outer(spec1[,1]+parentshift, spec2[,1], "-"))
     
-    posx <- posx[!(duplicated(posx[,1]) & duplicated(posx[,2])),  ]
+    posx <- rbind(posx, which(mx2 < abs(mztol) | mx2/spec1[,1] < 1e-6*ppm, arr.ind = T))
     
-    if(length(posx) ==2){
-      posx <- matrix(posx,nrow =1)
-    }
     
   }
   
-  if(nrow(posx) >= minpeaks && nrow(posx) > 0){
+      posx <- posx[!(duplicated(posx)),  , drop = FALSE]
+
+#preliminary/slow implementation with for loops...
+  if(any(duplicated(posx[,1]))){
+    
+    for(i in unique(posx[,1][duplicated(posx[,1])])){
+      mergeus <- posx[posx[,1]==i,]
+      spec2[mergeus[,2]] <- do.call(mean, list(x = spec2[mergeus[,2]]))
+    }
+    
+  }
+      
+      if(any(duplicated(posx[,2]))){
+        
+        for(i in unique(posx[,2][duplicated(posx[,2])])){
+          mergeus <- posx[posx[,2]==i,]
+          spec1[mergeus[,1]] <- do.call(mean, list(x = spec1[mergeus[,1]]))
+        }
+        
+      }
+      
+      posxuni <- posx[(!duplicated(posx[,1]) & !duplicated(posx[,2])),, drop = FALSE]
+  
+  if(nrow(posxuni) >= minpeaks && nrow(posx) > 0){
     
     if(nonmatched){
       
-      #v1 <- numeric(length(spec1[,1]) + length(spec2[,2]) - length(unique(posx )
-      
-      v1 <- c(spec1[posx[,1],2], spec1[-posx[,1],2], rep(0, length(spec2[-posx[,2],2])))
-      v2 <- c(spec2[posx[,2],2], rep(0, length(spec1[-posx[,1],2])), spec2[-posx[,2],2] )
+#count non matching peaks using the posx with duplicates to avoid treating double matched peaks as nonmatched
+      v1 <- c(spec1[posxuni[,1],2], spec1[-posx[,1],2], rep(0, length(spec2[-posx[,2],2])))
+      v2 <- c(spec2[posxuni[,2],2], rep(0, length(spec1[-posx[,1],2])), spec2[-posx[,2],2] )
       return(pairCompare(v1, v2, method = method))
       
     }
     
-    return(pairCompare(spec1[posx[,1],2], spec2[posx[,2],2], method = method))
+    return(pairCompare(spec1[posxuni[,1],2], spec2[posxuni[,2],2], method = method))
     
   }else{
     return(0)
