@@ -85,6 +85,12 @@ test_that("network1 and makeEdges work",{
                          minpeaks = 3,
                          nonmatched = T),1)
     
+    expect_equal(network1(spec1, spec1[FALSE,], mztol = 0.005,
+                          parentshift = 0,
+                          method = "cosine",
+                          minpeaks = 3,
+                          nonmatched = T),NA_real_)
+    
     expect_equal(network1(spec1, spec1+0.005, mztol = 0.005,
                           parentshift = 0,
                           method = "cosine",
@@ -132,12 +138,6 @@ test_that("network1 and makeEdges work",{
                           method = "cosine",
                           minpeaks = 4,
                           nonmatched = T),0)
-    
-    expect_equal(MassTools::network1(spec1, rbind(spec1,spec1), mztol = 0.05,
-                          parentshift = 0,
-                          method = "cosine",
-                          minpeaks = 6,
-                          nonmatched = T),1)
     
     expect_equal(network1(spec1, rbind(spec1+c(1:3,0,0,0),spec1), mztol = 2,
                                      parentshift = 0,

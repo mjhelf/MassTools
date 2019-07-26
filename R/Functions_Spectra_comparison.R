@@ -80,6 +80,8 @@ network1 <- function(spec1, spec2,
                      minpeaks = 6,
                      nonmatched = T){
   
+  if(!nrow(spec1) | !nrow(spec2)){return(NA_real_)}
+  
   mx <- abs(outer(spec1[,1], spec2[,1], "-"))
   
   
