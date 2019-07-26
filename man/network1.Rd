@@ -4,7 +4,7 @@
 \alias{network1}
 \title{network1}
 \usage{
-network1(spec1, spec2, mztol = 0.005, parentshift = 0,
+network1(spec1, spec2, mztol = 0.005, ppm = 0, parentshift = 0,
   method = "cosine", minpeaks = 6, nonmatched = T)
 }
 \arguments{
@@ -12,7 +12,9 @@ network1(spec1, spec2, mztol = 0.005, parentshift = 0,
 
 \item{spec2}{spectrum 2}
 
-\item{mztol}{allowed m/z difference between peaks to match matching}
+\item{mztol}{max m/z difference between peaks to match matching}
+
+\item{ppm}{max difference between peaks in ppm}
 
 \item{parentshift}{m/z difference between parentmasses (importantly, 
 has to be Parent(spec2) - Parent(spec1) ) to find alternative matches /
@@ -33,7 +35,6 @@ the result of the method call, a numeric similarity score
 \description{
 Compare two spectra and calculate a similarity score 
 (e.g. intensity values of matched MS peaks)
-NOTE: Current limitations: (1) peaks from one spectrum can match multiple 
-peaks from the other scan (workaround: call quickMergeMS with ppm = 0 and 
-mzdiff same as mzdiff here on both spectra prior to calling network1)
+NOTE: handling matching peaks from one spectrum that match multiple 
+peaks from the other spectrum is implemented now but needs testing
 }
