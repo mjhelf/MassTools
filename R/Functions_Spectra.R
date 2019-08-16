@@ -210,3 +210,38 @@ annotateSpectrum <- function(labels, spectrum,
   
   return(foundpeaks_annotated)
 }
+
+
+#' findPatterns
+#'
+#' find mz patterns in a list of spectra
+#'
+#' @param speclist list of spectra (matrices, all with two columns: \code{mz} and \code{intensity})
+#' @param patterns a named list of patterns (numeric vectors of mz values to look for)
+#' @param ppm min difference between peaks in ppm
+#' @param mzdiff min difference between peaks in m/z
+#'
+#' @return a list (same length as speclist) of logical vectors specifying if patterns are matched
+#'
+#'@export
+findPatterns <- function(speclist,
+                             patterns,
+                             ppm = 5,
+                        mzdiff = 0){
+ return(
+  lapply(speclist, function(x){
+    return(
+    sapply(patterns,function(p){
+          if(!length(x) || !length(x[,1])){
+           return(FALSE) 
+          }
+      
+matched <- matchNumbers(x[,1], p, ppm = ppm, abs = mzdiff)
+      if(length(unique(matched[,2])) == length(p)){
+        return(TRUE)
+      }
+     return(FALSE) 
+    })
+     )  })
+ )
+    }

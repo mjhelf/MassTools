@@ -93,3 +93,36 @@ test_that("mergeMS noise and maxpeaks arguments work",{
   expect_equal(mergeMS(MS2, maxpeaks = NULL, noiselevel = 10),
                MS2[FALSE,])
 })
+
+
+test_that("findPatterns works",{
+  
+  MS2 <- matrix(c(100, 100.5, 101, 101.5,
+                  10, 100, 10000, 1000), ncol = 2, dimnames = list(NULL, c("mz","intensity")))
+  
+  #maxpeaks tests
+  expect_equal(findPatterns(list(MS2), patterns = list(pattern1 = c(100,100.5)), ppm = 5, mzdiff = 0),
+               list(c(pattern1 = TRUE)))
+  
+  expect_equal(findPatterns(list(MS2), patterns = list(pattern1 = c(100,100.5),
+                                                       pattern2 = c(100,101.5)),
+                            ppm = 5, mzdiff = 0),
+               list(c(pattern1 = TRUE,
+                      pattern2 = TRUE)))
+  
+  expect_equal(findPatterns(list(MS2, NULL), patterns = list(pattern1 = c(100,100.5),
+                                                       pattern2 = c(100,101.5)),
+                            ppm = 5, mzdiff = 0),
+               list(c(pattern1 = TRUE,
+                      pattern2 = TRUE),
+                    c(pattern1 = FALSE,
+                      pattern2 = FALSE)))
+  
+  expect_equal(findPatterns(list(MS2, NULL), patterns = list(pattern1 = c(100,100.5),
+                                                             pattern2 = c(100,103.5)),
+                            ppm = 5, mzdiff = 0),
+               list(c(pattern1 = TRUE,
+                      pattern2 = FALSE),
+                    c(pattern1 = FALSE,
+                      pattern2 = FALSE)))
+  })
