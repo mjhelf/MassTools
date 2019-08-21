@@ -15,6 +15,12 @@
 #' highest peak in merged spectrum at relative intensity 1) will be removed 
 #' @param maxpeaks if not NULL, maximum number of peaks in merged spectrum.
 #' Lowest intensity peaks will be removed from merged spectrum.
+#' 
+#' @return 
+#' if \code{speclist} is a \code{Spectra} object or
+#'  a \code{list} of \code{Spectrum} objects: returns a \code{Spectrum} object.
+#' if \code{speclist} is a \code{matrix} object or
+#'  a \code{list} of \code{matrix} objects: returns a \code{Spectrum} object.
 #'
 #' @export
 mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
@@ -26,68 +32,76 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
   if(length(speclist) == 0){return(matrix(numeric(0),ncol = 2, dimnames = list(NULL,c("mz", "intensity"))))}
   
   if(is.list(speclist) || is(speclist,"Spectra")){
-    
     if(is(speclist[[1]],"Spectrum")){
+      #assume this is a list of Spectrum objects and use the first Spectrum as
+      #template/ main spectrum of the output
       SpectrumOut <- speclist[[1]]
       
-      aspec <- do.call(rbind,lapply(speclist, function(x){matrix(c(x@mz, x@intensity),ncol = 2)}))
-      
-
+      #make a matrix conatining all peaks
+      aspec <- do.call(rbind,lapply(speclist,
+                                    function(x){matrix(c(x@mz, x@intensity),
+                                                       ncol = 2)}))
       }else{
+        #signal to output a matrix rather than a Spectrum Object
        SpectrumOut <- NULL 
-       
            aspec <- do.call(rbind,speclist)
-
       }
       
-
-    
+  }else if(is(speclist,"Spectrum")){
+    #merge peaks inside a single Spectrum object
+    SpectrumOut <- speclist
+    aspec <- matrix(c(speclist@mz,
+                      speclist@intensity),ncol = 2)
   }else{
+    #merge peaks inside a single spectrum matrix object
     SpectrumOut <- NULL 
-    
     aspec <- speclist
-    
   }
   
-  #safeguards
-  if(is.null(aspec)){return(matrix(numeric(0),ncol = 2, dimnames = list(NULL,c("mz", "intensity"))))}
+  #safeguard against speclist being NULL or a list of only NULL
+  if(is.null(aspec)){return(matrix(numeric(0),
+                                   ncol = 2,
+                                   dimnames = list(NULL,c("mz", "intensity"))))}
   
   
   #remove 0 intensity peaks because they will produce NaN mz values downstream
-  
   if(removeZeros){
     aspec <- aspec[aspec[,2] != 0,, drop = FALSE]
   }
   
-  #if(length(aspec) == 0){return(NULL)}
-  
-  
+  #make sure peaks are in ascending order by mz
   if(nrow(aspec) > 1){
     aspec <- aspec[order(aspec[,1]),]
   }else{
    return(aspec) 
   }
   
-    if(count){
+  #add a count column to count the number of peaks that were merged into each peak
+  #of the output
+  if(count){
     aspec <- cbind(aspec, matrix(rep(1,nrow(aspec)),ncol = 1, dimnames = list(NULL,"count")))
     }
     
-    
+  # diff along the ordered mz values
   margins <- diff(aspec[,1])
   
+  # convert to ppm values
   margins_ppm <- margins/aspec[-nrow(aspec),1]/(1e-6)
   
+  # check which diff values are below the specified tolerances
   belowmargin <- (margins <= mzdiff | margins_ppm <= ppm)
   
   
-  #note: conveniently evaluates to FALSE if only one peak left (and belowmargin is logical(0) as result of )
+  #note: conveniently evaluates to FALSE if belowmargin is logical(0)
+  # as a result of trying to get belowmargin from an aspec with only one peak
   while(any(belowmargin)){
   
     #index of first peak in a group that is belowmargin, peaks following a first peak belowmargin should not count
-    #should dorectly translate to index in aspec..
+    #should correctly translate to index in aspec..
   firsts <- which( !c(FALSE,belowmargin[-length(belowmargin)]) & belowmargin)
   
   if(iterative){
+    #in this case, get the peaks following the first peak of a group
   seconds <- firsts + 1
   }else{
     #finding the last entry in the group, iterative aggregation will merge all
@@ -96,15 +110,20 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
     
   }
   
- 
-  
   sumints <- (aspec[firsts,2] + aspec[seconds,2]) #intensity sum
   
-  
+  #
    if(!removeZeros && any(sumints == 0)){
      rem <- which(sumints == 0)
+     #keep track of them and remove them later, but skip the for the weighted mz
+     #average step
+     secondZeros <- seconds[rem]
      firsts <- firsts[-rem]
      seconds <- seconds[-rem]
+     sumints <- sumints[-rem]
+     
+   }else{
+     secondZeros <- numeric(0)  
      }
   
   aspec[firsts,1] <-   (aspec[firsts,1]*aspec[firsts,2] + aspec[seconds,1]*aspec[seconds,2]) / sumints #mz weighted average
@@ -116,7 +135,7 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
   }
   
   #remove the seconds             
-  aspec <- aspec[-seconds,, drop = FALSE]  
+  aspec <- aspec[-c(seconds,secondZeros),, drop = FALSE]  
   
   
   #reassess loop condition:

@@ -27,6 +27,12 @@ highest peak in merged spectrum at relative intensity 1) will be removed}
 \item{maxpeaks}{if not NULL, maximum number of peaks in merged spectrum.
 Lowest intensity peaks will be removed from merged spectrum.}
 }
+\value{
+if \code{speclist} is a \code{Spectra} object or
+ a \code{list} of \code{Spectrum} objects: returns a \code{Spectrum} object.
+if \code{speclist} is a \code{matrix} object or
+ a \code{list} of \code{matrix} objects: returns a \code{Spectrum} object.
+}
 \description{
 Merge MS spectra, best used with noise-free spectra. Will merge all peaks that are EITHER within ppm OR within mzdiff range (mzdiff typically used to allow larger ppm difference in low mz range)
 }

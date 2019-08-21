@@ -1,4 +1,4 @@
-context("Sprecta comparison functions")
+context("Spectra comparison functions")
 
 
 test_that("pairCompare works",{
