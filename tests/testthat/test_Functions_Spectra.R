@@ -74,7 +74,8 @@ test_that("mergeMS counts combined peaks",{
 test_that("mergeMS noise and maxpeaks arguments work",{
   
   MS2 <- matrix(c(100, 100.5, 101, 101.5,
-                  10, 100, 10000, 1000), ncol = 2, dimnames = list(NULL, c("mz","intensity")))
+                  10, 100, 10000, 1000), ncol = 2,
+                dimnames = list(NULL, c("mz","intensity")))
   
   #maxpeaks tests
   expect_equal(mergeMS(MS2, maxpeaks = 9, noiselevel = 0),
@@ -92,6 +93,130 @@ test_that("mergeMS noise and maxpeaks arguments work",{
   
   expect_equal(mergeMS(MS2, maxpeaks = NULL, noiselevel = 10),
                MS2[FALSE,])
+})
+
+test_that("mergeMS removeZeros argument works as expected",{
+  
+  MS2 <- matrix(c(100, 100.5, 101, 101.5,
+                  10, 100, 10000, 1000), ncol = 2,
+                dimnames = list(NULL, c("mz","intensity")))
+  
+  MS3 <- matrix(c(100, 100.25, 100.5,  100.7, 100.75,  101, 101.05, 
+                   10,      0,   100,      0,      0,  10000,  0),
+                ncol = 2,
+                dimnames = list(NULL, c("mz","intensity")))
+  
+  #maxpeaks tests
+  expect_equal(mergeMS(MS2, maxpeaks = 9, noiselevel = 0,
+                       removeZeros = F),
+               MS2)
+  
+  expect_equal(mergeMS(MS3, maxpeaks = NULL, noiselevel = 0,
+                       removeZeros = TRUE),
+               MS2[-nrow(MS2),])
+  
+  expect_equal(mergeMS(MS3, maxpeaks = NULL, noiselevel = 0,
+                       removeZeros = FALSE),
+               MS3)
+  
+  expect_equal(mergeMS(MS3, maxpeaks = NULL, noiselevel = 0, mzdiff = 0.1,
+                       removeZeros = FALSE),
+               MS3[c(-5,-nrow(MS3)),])
+  
+  
+})
+
+MS4 <- matrix(c(100, 100.25, 100.5,  100.7, 100.75,  101, 101.05, 
+                10,      10,    10,     10,      10,  10,     10),
+              ncol = 2,
+              dimnames = list(NULL, c("mz","intensity")))
+
+test_that("mergeMS toleranceFactor argument works as expected",{
+  
+  #tolerance factor tests
+  expect_false(identical(mergeMS(MS4, noiselevel = 0,
+                       removeZeros = F, mzdiff = 0.1,
+                       toleranceFactor = 1),
+                       mergeMS(MS4, noiselevel = 0,
+                               removeZeros = F, mzdiff = 0.1,
+                               toleranceFactor = 5)))
+  
+  
+  expect_equal(mergeMS(MS4, noiselevel = 0,
+                       removeZeros = F, mzdiff = 0.1,
+                       toleranceFactor = c(0.4,5)),
+               mergeMS(mergeMS(MS4, noiselevel = 0,
+                               removeZeros = F, mzdiff = 0.1,
+                               toleranceFactor = c(0.4)), noiselevel = 0,
+                       removeZeros = F, mzdiff = 0.1,
+                       toleranceFactor = c(5)))
+  
+})
+
+test_that("mergeMS iterative argument works as expected",{
+  #iterative
+  MS5 <- matrix(c(100, 100.5, 101.5, 102,
+                  1000, 2000, 1000, 2000), ncol = 2,
+                dimnames = list(NULL, c("mz","intensity")))
+  
+  expect_equal(mergeMS(MS5, maxpeaks = NULL, mzdiff = 0.6,
+                       noiselevel = 0, iterative = TRUE,
+                       removeZeros = TRUE),
+               mergeMS(MS5, maxpeaks = NULL, mzdiff = 0.6,
+                       noiselevel = 0, iterative = FALSE,
+                       removeZeros = TRUE))
+               
+  expect_equal(mergeMS(MS4, maxpeaks = NULL, mzdiff = 0.3,
+          noiselevel = 0, iterative = FALSE,
+          removeZeros = TRUE),
+  matrix(c(mean(MS4[,1]), 70), ncol = 2,
+                      dimnames = list(NULL, c("mz","intensity"))))
+  
+  expect_equal(mergeMS(MS4, maxpeaks = NULL, mzdiff = 0.3,
+          noiselevel = 0, iterative = TRUE,
+          removeZeros = TRUE),
+  matrix(c(mean(MS4[1:2,1]), mean(MS4[3:5,1]), mean(MS4[6:7,1]),
+                         20,               30,              20),
+         ncol = 2, dimnames = list(NULL, c("mz","intensity"))))
+  
+  MS6 <- matrix(c(100, 100.25, 100.5,  102.7, 102.75,  103, 103.05, 
+                  10,      10,    10,     10,      10,  10,     10),
+                ncol = 2,
+                dimnames = list(NULL, c("mz","intensity")))
+  
+  expect_equal(mergeMS(MS6, maxpeaks = NULL, mzdiff = 0.3,
+                       noiselevel = 0, iterative = FALSE,
+                       removeZeros = TRUE),
+               matrix(c(mean(MS6[1:3,1]), mean(MS6[4:7,1]),
+                                     30,               40), ncol = 2,
+                      dimnames = list(NULL, c("mz","intensity"))))
+  
+  expect_equal(mergeMS(MS6, maxpeaks = NULL, mzdiff = 0.3,
+                       noiselevel = 0, iterative = TRUE,
+                       removeZeros = TRUE),
+               matrix(c(mean(MS6[1:2,1]), MS6[3,1], mean(MS6[4:7,1]),
+                                      20,       10,              40), ncol = 2,
+                      dimnames = list(NULL, c("mz","intensity"))))
+  
+  
+  MS7 <- matrix(c(100, 100.25, 100.5,  102.7, 102.75,  103, 103.05, 110,
+                  10,      10,    10,     10,      10,  10,     10,  10),
+                ncol = 2,
+                dimnames = list(NULL, c("mz","intensity")))
+  
+  expect_equal(mergeMS(MS7, maxpeaks = NULL, mzdiff = 0.3,
+                       noiselevel = 0, iterative = FALSE,
+                       removeZeros = TRUE),
+               matrix(c(mean(MS7[1:3,1]), mean(MS7[4:7,1]), 110,
+                                      30,             40,   10), ncol = 2,
+                      dimnames = list(NULL, c("mz","intensity"))))
+  
+  expect_equal(mergeMS(MS7, maxpeaks = NULL, mzdiff = 0.3,
+                       noiselevel = 0, iterative = TRUE,
+                       removeZeros = TRUE),
+               matrix(c(mean(MS7[1:2,1]), MS7[3,1], mean(MS7[4:7,1]), 110,
+                                      20,       10,              40,  10), 
+                      ncol = 2, dimnames = list(NULL, c("mz","intensity"))))
 })
 
 

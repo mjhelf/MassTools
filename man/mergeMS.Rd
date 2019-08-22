@@ -5,7 +5,8 @@
 \title{mergeMS}
 \usage{
 mergeMS(speclist, ppm = 5, mzdiff = 5e-04, count = FALSE,
-  iterative = T, removeZeros = T, noiselevel = 0, maxpeaks = NULL)
+  iterative = T, removeZeros = T, noiselevel = 0, maxpeaks = NULL,
+  toleranceFactor = 1)
 }
 \arguments{
 \item{speclist}{list of spectra (matrices, all with two columns: \code{mz} and \code{intensity})}
@@ -26,6 +27,9 @@ highest peak in merged spectrum at relative intensity 1) will be removed}
 
 \item{maxpeaks}{if not NULL, maximum number of peaks in merged spectrum.
 Lowest intensity peaks will be removed from merged spectrum.}
+
+\item{toleranceFactor}{should be a numeric vector of increasing values to recursively
+apply as a factor to the ppm and mzdiff tolerances.}
 }
 \value{
 if \code{speclist} is a \code{Spectra} object or

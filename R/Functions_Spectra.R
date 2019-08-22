@@ -15,6 +15,9 @@
 #' highest peak in merged spectrum at relative intensity 1) will be removed 
 #' @param maxpeaks if not NULL, maximum number of peaks in merged spectrum.
 #' Lowest intensity peaks will be removed from merged spectrum.
+#' @param toleranceFactor should be a numeric vector of increasing values to recursively
+#' apply as a factor to the ppm and mzdiff tolerances.
+#' 
 #' 
 #' @return 
 #' if \code{speclist} is a \code{Spectra} object or
@@ -27,7 +30,12 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
                     count = FALSE, iterative = T,
                     removeZeros = T,
                     noiselevel = 0,
-                    maxpeaks = NULL){
+                    maxpeaks = NULL,
+                    toleranceFactor = 1){
+  
+  if(missing(toleranceFactor) || !length(toleranceFactor)){
+   toleranceFactor <- 1 
+  }
   
   if(length(speclist) == 0){return(matrix(numeric(0),ncol = 2, dimnames = list(NULL,c("mz", "intensity"))))}
   
@@ -89,7 +97,7 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
   margins_ppm <- margins/aspec[-nrow(aspec),1]/(1e-6)
   
   # check which diff values are below the specified tolerances
-  belowmargin <- (margins <= mzdiff | margins_ppm <= ppm)
+  belowmargin <- (margins <= mzdiff*toleranceFactor[1] | margins_ppm <= ppm*toleranceFactor[1])
   
   
   #note: conveniently evaluates to FALSE if belowmargin is logical(0)
@@ -106,7 +114,7 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
   }else{
     #finding the last entry in the group, iterative aggregation will merge all
     #into one without the "mz walking" iterative effect
-  seconds <- which(belowmargin & !c(belowmargin[-1], FALSE))
+  seconds <- which(c(FALSE, belowmargin) & !c(belowmargin, FALSE))
     
   }
   
@@ -137,13 +145,17 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
   #remove the seconds             
   aspec <- aspec[-c(seconds,secondZeros),, drop = FALSE]  
   
+  #reordering neccessary because mz order may change in !iterative mode!
+  if(!iterative){
+    aspec <- aspec[order(aspec[,1]),, drop = FALSE]
+  }
   
   #reassess loop condition:
   margins <- diff(aspec[,1])
   
   margins_ppm <- margins/aspec[-nrow(aspec),1]/(1e-6)
   
-  belowmargin <- (margins <= mzdiff | margins_ppm <= ppm)
+  belowmargin <- (margins <= mzdiff*toleranceFactor[1] | margins_ppm <= ppm*toleranceFactor[1])
   
   
   }
@@ -176,13 +188,33 @@ mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,
     SpectrumOut@intensity <- aspec[,2]
     
     SpectrumOut@peaksCount <- nrow(aspec)
-  
+    
+    if(length(toleranceFactor) ==1){
     return(SpectrumOut)
+    }else{
+      return(mergeMS(speclist = SpectrumOut,
+                     ppm =ppm, mzdiff = mzdiff,
+                     count = count, iterative = iterative,
+                     removeZeros = removeZeros,
+                     noiselevel = noiselevel,
+                     maxpeaks = maxpeaks,
+                     toleranceFactor = toleranceFactor[-1]))
+      }
+      
   }
     
-    
-  return(aspec)
-  
+  if(length(toleranceFactor) ==1){
+    return(aspec)
+  }else{
+    return(mergeMS(speclist = aspec,
+                   ppm =ppm, mzdiff = mzdiff,
+                   count = count, iterative = iterative,
+                   removeZeros = removeZeros,
+                   noiselevel = noiselevel,
+                   maxpeaks = maxpeaks,
+                   toleranceFactor = toleranceFactor[-1]))
+  }
+
 }
 
 
