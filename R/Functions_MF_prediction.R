@@ -138,8 +138,9 @@ calcMF <- function(mz = 200.000659,
   
   
   
-  
-  mm <- decomposeMass(mz, z = z, 
+   #have to add an electon mass to mz for each charge to get uncharged mass 
+  #[needed for correct ppm calculation in decomposeMass; maybe breaks nitrogen rule calculation]
+  mm <- decomposeMass(mz + z*5.48579909070e-4,   z = z, 
                       maxisotopes = 1, 
                       ppm = ppm, 
                       mzabs = 0,

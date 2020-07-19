@@ -1,6 +1,6 @@
 Package: MassTools
 Title: R package for mass and molecular formula calculations
-Version: 0.2.10
+Version: 0.2.11
 Authors@R: person("Maximilian", "Helf", email = "maximilian.helf@gmail.com", role = c("cre", "aut"), comment = c(ORCID = "0000-0002-1393-3999"))
 biocViews: MassSpectrometry, Cheminformatics
 Description: Provides heuristic filters for molecula formulas calculated with Rdisop and simple formatting functions for molecular formulas.

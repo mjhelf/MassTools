@@ -1,0 +1,2 @@
+0.2.11
+Changed calcMF to use ppm limits (changed call to Rdisop::decomposeMass())
