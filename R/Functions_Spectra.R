@@ -23,7 +23,7 @@
 #' if \code{speclist} is a \code{Spectra} object or
 #'  a \code{list} of \code{Spectrum} objects: returns a \code{Spectrum} object.
 #' if \code{speclist} is a \code{matrix} object or
-#'  a \code{list} of \code{matrix} objects: returns a \code{Spectrum} object.
+#'  a \code{list} of \code{matrix} objects: returns a \code{matrix} object.
 #'
 #' @export
 mergeMS <- function(speclist, ppm =5, mzdiff = 0.0005,

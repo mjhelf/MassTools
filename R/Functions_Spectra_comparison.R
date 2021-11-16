@@ -1,3 +1,36 @@
+#' cosine2
+#' 
+#' simple cosine calculation
+#' 
+#' @param x numeric vector 1
+#' @param y numeric vector 2
+#' 
+#' @return cosine between two numeric vectors of equal length
+#' 
+#' 
+cosine <- function(x,y){
+  
+  sum(x * y)/(sqrt(sum(x * x)) * sqrt(sum(y * y)))  
+  
+}
+
+#' spectralAngle
+#'
+#' Calculate spectral angle
+#'
+#' @param x numeric vector 1
+#' @param y numeric vector 2
+#' 
+#' @return spectral angle score between two numeric vectors of equal length
+#' 
+#' 
+spectralAngle <- function(x,y){
+  
+  1 - ((2*acos(cosine(x,y)))/pi)
+  
+}
+
+
 #' pairCompare
 #'
 #' Compare two vectors of equal length pairwise and calculate a similarity 
@@ -7,16 +40,16 @@
 #' @param v1 vector 1
 #' @param v2 vector 2
 #' @param NAasZero replace NA values with 0 if the value is NA in one vector, but not the other
-#' @param method "cosine" will use lsa::cosine(), "pearson" will use stats::cor()
+#' @param method "cosine" will use MassTools::cosine(), "pearson" will use stats::cor()
 #' 
 #' @importFrom stats cor
-#' @importFrom lsa cosine
 #'
 #' @return the result of the method call, a numeric similarity score
 #'
 pairCompare <- function(v1, v2, NAasZero = T,
                         method = c("cosine", "pearson",
-                                   "kendall", "spearman")){
+                                   "kendall", "spearman",
+                                   "spectralAngle")){
   
   #remove instances where values in both vectors are NA
   remfeats <- is.na(v1) & is.na(v2)
@@ -42,7 +75,9 @@ pairCompare <- function(v1, v2, NAasZero = T,
   }
   
   if(method[1] == "cosine"){
-    cosine(matrix(c(v1,v2),ncol = 2, byrow = F))[1,2]
+    cosine(v1,v2)
+  }else if(method[1] == "spectralAngle"){
+    spectralAngle(v1,v2)
   }else{
     cor(v1,v2, method = method[1], use = "pairwise.complete.obs")
   }
@@ -63,7 +98,7 @@ pairCompare <- function(v1, v2, NAasZero = T,
 #' has to be Parent(spec2) - Parent(spec1) ) to find alternative matches /
 #'  neutral loss matches; will only be calculated if \code{abs(parentshift) >  abs(mztol)}
 #' @param method method passed on to \code{\link{pairCompare}()}; 
-#' "cosine" will use lsa::cosine(), "pearson" will use stats::cor()
+#' "cosine" will use MassTools::cosine(), "pearson" will use stats::cor()
 #' @param minpeaks minimum number 
 #' of peaks that have to be matched, otherwise returns 0
 #' @param nonmatched if TRUE, will add non-matching peaks to calculation, 
@@ -149,7 +184,7 @@ network1 <- function(spec1, spec2,
 #' @param speclist (non-nested) list of MS spectra
 #' @param parentmasses vector of parent m/z values (same length as speclist).
 #' @param mztol max difference between matched peaks in m/z
-#' @param method "cosine" will use lsa::cosine(), "pearson" will use stats::cor()
+#' @param method "cosine" will use MassTools::cosine(), "pearson" will use stats::cor()
 #' @param minpeaks minimum number of peaks that have to be matched, otherwise returns 0
 #' @param nonmatched if TRUE, will add non-matching peaks to calculation, 
 #' with 0 intensity in the spectrum missing the peak
@@ -181,6 +216,7 @@ makeEdges <- function(speclist,
     selectlist[[i]] <- i:length(speclist)
   }
   
+  p20 <- ceiling(length(selectlist)/20)
   if(!is.null(parentmasses)){
     parentmasses <- parentmasses[selNonNulls]
     
@@ -192,7 +228,9 @@ makeEdges <- function(speclist,
     }
     
     
-    alledges <-  mapply(function(sel, specs, pmasses){
+    alledges <-  mapply(function(n, specs, pmasses){
+      if(!n%%p20){message(paste((n/p20)*5, "% done"))}
+      sel <- selectlist[[n]]
       mapply(network1, spec1 = specs[sel[-1]],  parentshift = pmasses,
              MoreArgs = list(spec2 = specs[[sel[1]]],
                              mztol = mztol,
@@ -200,14 +238,17 @@ makeEdges <- function(speclist,
                              method = method,
                              nonmatched = nonmatched))
     }, 
-    sel = selectlist, 
+    n = seq_len(length(selectlist)), 
     pmasses = pmassShifts,
     MoreArgs = list(specs = speclist),
     SIMPLIFY = F)
   }else{
     
     
-    alledges <-  lapply(selectlist, function(sel, specs, mzt, mp, nonm){
+    alledges <-  lapply(seq_len(length(selectlist)), 
+                        function(n, specs, mzt, mp, nonm){
+                          if(!n%%p20){message(paste((n/p20)*5, "% done"))}
+                          sel <- selectlist[[n]]
       lapply(specs[sel[-1]],network1,
              spec2 = specs[[sel[1]]],
              method = method,

@@ -16,7 +16,7 @@ test_that("calcMF correctly passes through Rdisop::decomposeMass results",{
                   summarize = F,
                   BPPARAM = NULL)
   
-  rdires <- Rdisop::decomposeMass(200.000659,
+  rdires <- Rdisop::decomposeMass(200.000659+ 1*5.48579909070e-4,
                                   z = 1,
                                   ppm = 5,
                                   mzabs = 0,
